@@ -17,19 +17,19 @@ arid_eda <- function(data_frame, response, response_type, features=c())
 
 #' Function that performs a linear regression on continuous response data.
 #' This function will fit a linear regression model on the input dataframe
-#' using the response supplied and all or optionally specified features given.
+#' using the response supplied and provide skLearn interface functionality
 #'
 #'@param data_frame the input dataframe to analyze
 #'@param response the column name of the response variable
 #'@param features a list of explanatory variable column names
-#'@param estimator the function used to fit the linear regression model
 #'@param regularization what level of regularization to use in the model
+#'@param alpha the regularization weight parameter to use
 #'
-#'@returns a dataframe with a list of features and their coefficients
+#'@returns a linear regression model wrapped in an sklearn style class
 #'
 #'@examples
 #'arid_linreg(df, income)
-arid_linreg <- function(data_frame, response, features=c(), estimator=None, regularization=NULL)
+arid_linreg <- function(df, response, features=c(), regularization=NULL, alpha = c(1))
 
 #' Given a data frame, a response variable and explanatory variables (features),
 #' this function fits a logistic regression and outputs the statistical summary
