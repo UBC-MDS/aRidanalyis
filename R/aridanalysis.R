@@ -32,23 +32,18 @@ arid_eda <- function(df, response, response_type, features=c())
 arid_linreg <- function(df, response, features=c(), regularization=NULL, alpha = c(1))
 
 #' Given a data frame, a response variable and explanatory variables (features),
-#' this function fits a logistic regression and outputs the statistical summary
-#' including the interpretation.
+#' this function fits a logistic regression
 #'
-#'@param data_frame the input dataframe to analyze
+#'@param df the input dataframe to analyze
 #'@param response the column name of the response variable
 #'@param features a list of explanatory variable column names
-#'@param type a string indicating classification type. Either "binomial", "ordinal" or "multinomial"
-#'@param model A string indicating the model type. Either "additive" or "interactive"
-#'@param polynomial a boolean indicating whether polynomial features should be considered or not
-#'@param alpha significance level for analysis
+#'@param type a string indicating classification type. Either "binomial" or "multinomial"
 #'
-#'@returns dataframe with 4 columns: 'features', 'p-value', 'significant', 'interpretation'
+#'@returns a logistic regression model wrapped in an sklearn style class
 #'
 #'@examples
-#'arid_logreg(df, 'target', ['feat1', 'feat2', 'feat3'], type="multinomial",
-#' model="interactive", polynomial=True, alpha=0.01)
-arid_logreg <- function(data_frame, response, features=c(), type="binomial", model="additive", polynomial=False, alpha=0.05)
+#'arid_logreg(df, 'target', ['feat1', 'feat2', 'feat3'], type="multinomial")
+arid_logreg <- function(data_frame, response, features=c(), type="binomial")
 
 
 #' A function that performs linear regression on counting data when the response is
