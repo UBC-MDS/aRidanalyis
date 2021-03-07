@@ -25,7 +25,7 @@ arid_eda <- function(data_frame, response, response_type, features=c())
 #'@param regularization what level of regularization to use in the model
 #'@param alpha the regularization weight parameter to use
 #'
-#'@returns a linear regression model wrapped in a new class
+#'@returns a linear regression model wrapped in an sklearn style class
 #'
 #'@examples
 #'arid_linreg(df, income)
