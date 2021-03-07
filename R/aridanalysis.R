@@ -53,16 +53,15 @@ arid_logreg <- function(data_frame, response, features=c(), type="binomial", mod
 
 #' A function that performs linear regression on counting data when the response is
 #' restricted to be positive and natural. This function will perform count regression
-#' to the specified columns    of a data frame and return a substantial inferential analysis.
+#' to the specified columns of a data frame and return a substantial inferential analysis.
 #'
 #'@param data_frame the input dataframe to analyze
 #'@param response the column name of the response variable
 #'@param features a list of explanatory variable column names
-#'@param type a string indicating classification type. Either "binomial", "ordinal" or "multinomial"
 #'@param model A string indicating the model type. Either "additive" or "interactive"
 #'@param alpha significance level for analysis
 #'
-#'@returns dataframe with 4 columns: 'features', 'p-value', 'significant', 'interpretation'
+#'@returns a wrapped statistical linear model with new functionalities.
 #'@returns a string family was used in the generalized linear regression model based on an overdispersion and fitting analysis
 #'
 #'@examples
