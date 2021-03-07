@@ -14,15 +14,15 @@ This function takes in the data frame of interest and generates summary statisti
 
 ### `arid_linreg`
 
-This function takes in the data frame of interest and performs a regular linear regression with the given regularization and features. The function then outputs an sklearn regression model for prediction and an equivalent statsmodel regression model to provide inference.
+This function takes in the data frame of interest and performs a regular linear regression with the given regularization and features. The function then outputs a regression model for prediction and an equivalent model to provide inference.
 
 ### `arid_logreg`
 
-This function takes in a data frame and performs either binomial or multinomial classification based on user inputs. The function then outputs an sklearn logistic regression model for prediction and an equivalent statsmodel logit regression model to provide inference.
+This function takes in a data frame and performs either binomial or multinomial classification based on user inputs. The function then outputs a logistic regression model for prediction and an equivalent model to provide inference.
 
 ### `arid_countreg`
 
-This function takes a dataframe, its categorical and continuous variables and other user inputs to perform a Poisson regression. The function will return a sklearn Poisson regressor model for prediction and a wrapper statsmodel for inference purposes.
+This function takes a dataframe, its categorical and continuous variables and other user inputs to perform a Poisson regression. The function will return a Poisson regressor model for prediction and an equivalent model for inference purposes.
 
 ## R Ecosystem Role
 
