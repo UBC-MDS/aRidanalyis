@@ -8,11 +8,11 @@
 #'@param features a list of explanatory variable column names
 #'
 #'@returns a dataframe with a list of features and their coefficients
-#'@reutrns a ggplot object containing the EDA
+#'@retusns a ggplot object containing the EDA
 #'
 #'@examples
-#'arid_eda(house_prices, 'price', 'continuous, c('rooms', 'age','garage')
-arid_eda <- function(data_frame, response, response_type, features=c())
+#'arid_eda(house_prices, 'price', 'continuous, c('rooms', 'age','garage'))
+arid_eda <- function(df, response, response_type, features=c())
 
 
 #' Function that performs a linear regression on continuous response data.
