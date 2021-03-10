@@ -22,14 +22,19 @@ arid_eda <- function(data_frame, response, response_type, features=c())
 #'@param data_frame the input dataframe to analyze
 #'@param response the column name of the response variable
 #'@param features a list of explanatory variable column names
-#'@param regularization what level of regularization to use in the model
-#'@param alpha the regularization weight parameter to use
+#'@param regularization what level of regularization to use in the model (optional)
+#'@param lambda the regularization strength parameter to use (optional)
 #'
 #'@returns a linear regression model wrapped in an sklearn style class
 #'
 #'@examples
 #'arid_linreg(df, income)
 arid_linreg <- function(df, response, features=c(), regularization=NULL, lambda=NULL) {
+    
+  thisEnv <- environment()
+  assign("regularization_", regularization, thisEnv)
+  assign("lambda_", lambda, thisEnv)
+
   y <- df %>%
     dplyr::select({{response}}) %>%
     as.matrix()
@@ -46,53 +51,70 @@ arid_linreg <- function(df, response, features=c(), regularization=NULL, lambda=
     
   X <- cbind(cat_features, numeric_features)
     
-  model <- NULL
-  if(is.null(regularization)) {
-    lambda <- 0
-    model <- glmnet::glmnet(X, y, family = 'gaussian', alpha = 1, lambda = lambda)
-  }
-  else if(regularization == c("L1")) {
-    model <- glmnet::glmnet(X, y, alpha = 1, family = 'gaussian')
-  }
-  else if(regularization == c("L2")) {
-    model <- glmnet::glmnet(X, y, alpha = 0, family = 'gaussian')
-  }
-  else if(regularization == c("L1L2")) {
-    model <- glmnet::glmnet(X, y, alpha = 0, family = 'gaussian')
-  }
-      
-  coef_ <- NULL
-  if (is.null(lambda)) {
-    lambda <- glmnet::cv.glmnet(X, y)$lambda.min
-    coef_ <- glmnet::coef.glmnet(model, s = lambda)
-  }
-  else {
-    coef_ <- glmnet::coef.glmnet(model, s = lambda)
+  get_coefs <- function(X, y, model, lambda) {
+    coef_ <- NULL
+    if (is.null(lambda)) {
+      lambda <- glmnet::cv.glmnet(X, y)$lambda.min
+      coefs <- glmnet::coef.glmnet(model, s = lambda)
+    }
+    else {
+      coefs <- glmnet::coef.glmnet(model, s = lambda)
+    }
+    assign("lambda_", lambda, thisEnv)
+    return(coefs)
   }
     
+  set_coefs <- function(coefs, lambda) {
+    assign("intercept_", coefs[1], thisEnv)
+    assign("coef_", coefs[c(-1)], thisEnv)
+  }
+    
+  fit <- function(X, y) {
+    model <- NULL
+    regularization <- regularization_
+    lambda <- lambda_
+    if(is.null(regularization)) {
+      lambda <- 0
+      model <- glmnet::glmnet(X, y, family = 'gaussian', alpha = 1, lambda = lambda)
+    }
+    else if(regularization == c("L1")) {
+      model <- glmnet::glmnet(X, y, alpha = 1, family = 'gaussian')
+    }
+    else if(regularization == c("L2")) {
+      model <- glmnet::glmnet(X, y, alpha = 0, family = 'gaussian')
+    }
+    else if(regularization == c("L1L2")) {
+      model <- glmnet::glmnet(X, y, alpha = 0.5, family = 'gaussian')
+    }
+  
+    coefs <- get_coefs(X, y, model, lambda)
+    set_coefs(coefs) 
+        
+    return(model)
+  }
+    
+  predict <- function(newx) {
+    return(glmnet::predict.glmnet(model_, s = lambda_, newx = newx)[1])
+  }
+    
+  score <- function() {
+    model_$dev.ratio
+  }
+  
+  model <- fit(X, y)
+  assign("model_", model, thisEnv)
+ 
   arid_linreg <- list(
-    intercept_ = coef_[1],
-    coef_ = coef_[c(-1)],
-    model_ = model,
-    lambda_ = lambda
-    
+    thisEnv = thisEnv,
+    fit = fit,
+    predict = predict,
+    score = score,
+    intercept_ = intercept_,
+    coef_ = coef_
   )
-      
-  predict.arid_linreg=function(object, ...){
-    print(object$coef_)
-  }
-    
-  #beeping <- function(x) {
-  #  UseMethod("beeping")
-  #}
     
   class(arid_linreg) <- "arid_linreg"
-    
   return(arid_linreg)
-}
-
-predict.arid_linreg=function(object, ...){
-  print(object$coef_)
 }
 
 #' Given a data frame, a response variable and explanatory variables (features),
