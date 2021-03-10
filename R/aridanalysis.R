@@ -29,7 +29,71 @@ arid_eda <- function(data_frame, response, response_type, features=c())
 #'
 #'@examples
 #'arid_linreg(df, income)
-arid_linreg <- function(df, response, features=c(), regularization=NULL, alpha = c(1))
+arid_linreg <- function(df, response, features=c(), regularization=NULL, lambda=NULL) {
+  y <- df %>%
+    dplyr::select({{response}}) %>%
+    as.matrix()
+    
+  cat_features <- tdf %>%
+    dplyr::select(-y) %>%
+    dplyr::select_if(is.character) %>%
+    data.matrix()
+
+  numeric_features <- tdf %>%
+    dplyr::select(-y) %>%
+    dplyr::select_if(is.numeric) %>%
+    as.matrix()
+    
+  X <- cbind(cat_features, numeric_features)
+    
+  model <- NULL
+  if(is.null(regularization)) {
+    lambda <- 0
+    model <- glmnet::glmnet(X, y, family = 'gaussian', alpha = 1, lambda = lambda)
+  }
+  else if(regularization == c("L1")) {
+    model <- glmnet::glmnet(X, y, alpha = 1, family = 'gaussian')
+  }
+  else if(regularization == c("L2")) {
+    model <- glmnet::glmnet(X, y, alpha = 0, family = 'gaussian')
+  }
+  else if(regularization == c("L1L2")) {
+    model <- glmnet::glmnet(X, y, alpha = 0, family = 'gaussian')
+  }
+      
+  coef_ <- NULL
+  if (is.null(lambda)) {
+    lambda <- glmnet::cv.glmnet(X, y)$lambda.min
+    coef_ <- glmnet::coef.glmnet(model, s = lambda)
+  }
+  else {
+    coef_ <- glmnet::coef.glmnet(model, s = lambda)
+  }
+    
+  arid_linreg <- list(
+    intercept_ = coef_[1],
+    coef_ = coef_[c(-1)],
+    model_ = model,
+    lambda_ = lambda
+    
+  )
+      
+  predict.arid_linreg=function(object, ...){
+    print(object$coef_)
+  }
+    
+  #beeping <- function(x) {
+  #  UseMethod("beeping")
+  #}
+    
+  class(arid_linreg) <- "arid_linreg"
+    
+  return(arid_linreg)
+}
+
+predict.arid_linreg=function(object, ...){
+  print(object$coef_)
+}
 
 #' Given a data frame, a response variable and explanatory variables (features),
 #' this function fits a logistic regression and outputs the statistical summary
