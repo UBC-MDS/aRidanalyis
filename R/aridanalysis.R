@@ -1,3 +1,12 @@
+library(testthat)
+library(tidyverse)
+library(palmerpenguins)
+library(ggplot2)
+library(GGally)
+library(cowplot)
+library(grid)
+source("http://peterhaschke.com/Code/multiplot.R")
+
 #' Function to create summary statistics and basic EDA plots. Given a data frame,
 #' this function outputs general exploratory analysis plots as well as basic
 #' statistics summarizing trends in the features of the input data.
@@ -12,7 +21,41 @@
 #'
 #'@examples
 #'arid_eda(house_prices, 'price', 'continuous, c('rooms', 'age','garage'))
-arid_eda <- function(df, response, response_type, features=c())
+arid_eda <- function(df, response, response_type = 'numeric', features = c()){
+    
+    if (length(features) == 0){
+        filtered_df <- df %>% drop_na()
+        cols <- select(df, where(is.integer), where(is.double)) %>% colnames()
+        
+    } else {
+        filtered_df <- df %>% select(one_of(features), all_of(response), where(is.numeric)) %>% drop_na()
+        cols <- features
+    }
+    
+    myplots <- list()  # new empty list
+    
+    if (response_type == 'numeric'){
+        for (i in 1:length(cols)) {
+            p1 <- eval(substitute(
+                ggplot(data=filtered_df, aes_string(x=cols[i])) + 
+                  geom_histogram(fill="lightgreen", stat='count') +
+                  xlab(colnames(cols)[i]) + 
+                  ggtitle(cols[i])
+            ,list(i = i)))
+            myplots[[i]] <- p1  
+        }
+        
+    } else if(response_type == 'categorical'){
+        for (i in 1:length(cols)) {
+            p1 <- ggplot(filtered_df, aes_string(x = cols[i], fill = response)) + 
+                geom_density(alpha = 0.6)
+            myplots[[i]] <- p1  # add each plot into plot list
+        }
+    }
+    
+    multiplot(plotlist = myplots,  cols = 2)
+    ggcorr(filtered_df, label=TRUE) + ggtitle('Correlation Matrix') 
+}
 
 
 #' Function that performs a linear regression on continuous response data.
