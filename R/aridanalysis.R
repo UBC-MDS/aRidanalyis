@@ -22,12 +22,31 @@ source("http://peterhaschke.com/Code/multiplot.R")
 #'arid_eda(house_prices, 'price', 'continuous, c('rooms', 'age','garage'))
 arid_eda <- function(df, response, response_type = 'numeric', features = c()){
     
+    if (all(features %in% colnames(df)) == FALSE){
+        stop('one or more features are not present in data frame')
+    }
+    if (response %in% features){
+        stop('response must not be explicit from feature list')
+    }
+    if (response %in% colnames(df) == FALSE){
+        stop('response is not contained in data frame')
+    }
+    if (response_type == 'numeric'){
+        if (select(df, response) %>% pull() %>% is.numeric() == FALSE){
+            stop('Response is not numeric')
+        }
+    } else if (response_type == 'categorical'){
+        if (select(df, response) %>% pull() %>% is.numeric() == TRUE){
+            stop('Response is not categorical')
+        }
+    }  
+    
     if (length(features) == 0){
         filtered_df <- df %>% tidyr::drop_na()
         cols <- dplyr::select(df, where(is.integer), where(is.double)) %>% colnames()
         
     } else {
-        filtered_df <- df %>% dplyr::select(one_of(features), all_of(response), where(is.numeric)) %>% dplyr::drop_na()
+        filtered_df <- df %>% dplyr::select(one_of(features), all_of(response), where(is.numeric)) %>% tidyr::drop_na()
         cols <- features
     }
     
@@ -52,8 +71,9 @@ arid_eda <- function(df, response, response_type = 'numeric', features = c()){
         }
     }
     
-    multiplot(plotlist = myplots,  cols = 1)
-    GGally::ggcorr(filtered_df, label=TRUE) + ggtitle('Correlation Matrix') 
+    #multiplot(plotlist = myplots,  cols = 1)
+    myplots[[length(cols)+1]] <- GGally::ggcorr(filtered_df, label=TRUE) + ggtitle('Correlation Matrix') 
+    myplots
 }
 
 
