@@ -4,7 +4,7 @@ library(palmerpenguins)
 library(ggplot2)
 library(GGally)
 library(grid)
-source("http://peterhaschke.com/Code/multiplot.R")
+
 
 #' Function to create summary statistics and basic EDA plots. Given a data frame,
 #' this function outputs general exploratory analysis plots as well as basic
@@ -71,7 +71,6 @@ arid_eda <- function(df, response, response_type = 'numeric', features = c()){
         }
     }
 
-    #multiplot(plotlist = myplots,  cols = 1)
     myplots[[length(cols)+1]] <- GGally::ggcorr(filtered_df, label=TRUE) + ggplot2::ggtitle('Correlation Matrix')
     myplots
 }
