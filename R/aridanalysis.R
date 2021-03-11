@@ -3,7 +3,6 @@ library(tidyverse)
 library(palmerpenguins)
 library(ggplot2)
 library(GGally)
-library(cowplot)
 library(grid)
 source("http://peterhaschke.com/Code/multiplot.R")
 
@@ -24,11 +23,11 @@ source("http://peterhaschke.com/Code/multiplot.R")
 arid_eda <- function(df, response, response_type = 'numeric', features = c()){
     
     if (length(features) == 0){
-        filtered_df <- df %>% drop_na()
-        cols <- select(df, where(is.integer), where(is.double)) %>% colnames()
+        filtered_df <- df %>% tidyr::drop_na()
+        cols <- dplyr::select(df, where(is.integer), where(is.double)) %>% colnames()
         
     } else {
-        filtered_df <- df %>% select(one_of(features), all_of(response), where(is.numeric)) %>% drop_na()
+        filtered_df <- df %>% dplyr::select(one_of(features), all_of(response), where(is.numeric)) %>% dplyr::drop_na()
         cols <- features
     }
     
@@ -37,25 +36,26 @@ arid_eda <- function(df, response, response_type = 'numeric', features = c()){
     if (response_type == 'numeric'){
         for (i in 1:length(cols)) {
             p1 <- eval(substitute(
-                ggplot(data=filtered_df, aes_string(x=cols[i])) + 
-                  geom_histogram(fill="lightgreen", stat='count') +
-                  xlab(colnames(cols)[i]) + 
-                  ggtitle(cols[i])
+                ggplot2::ggplot(data=filtered_df, aes_string(x=cols[i])) + 
+                  ggplot2::geom_histogram(fill="lightgreen", stat='count') +
+                  ggplot2::xlab(colnames(cols)[i]) + 
+                  ggplot2::ggtitle(cols[i])
             ,list(i = i)))
             myplots[[i]] <- p1  
         }
         
     } else if(response_type == 'categorical'){
         for (i in 1:length(cols)) {
-            p1 <- ggplot(filtered_df, aes_string(x = cols[i], fill = response)) + 
-                geom_density(alpha = 0.6)
+            p1 <- ggplot2::ggplot(filtered_df, aes_string(x = cols[i], fill = response)) + 
+                ggplot2::geom_density(alpha = 0.6)
             myplots[[i]] <- p1  # add each plot into plot list
         }
     }
     
-    multiplot(plotlist = myplots,  cols = 2)
-    ggcorr(filtered_df, label=TRUE) + ggtitle('Correlation Matrix') 
+    multiplot(plotlist = myplots,  cols = 1)
+    GGally::ggcorr(filtered_df, label=TRUE) + ggtitle('Correlation Matrix') 
 }
+
 
 
 #' Function that performs a linear regression on continuous response data.
