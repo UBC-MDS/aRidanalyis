@@ -18,6 +18,8 @@ library(grid)
 #'@returns a dataframe with a list of features and their coefficients
 #'@returns a ggplot object containing the EDA
 #'
+#'@export
+#'
 #'@examples
 #'arid_eda(house_prices, 'price', 'continuous, c('rooms', 'age','garage'))
 arid_eda <- function(df, response, response_type = 'numeric', features = c()){
@@ -54,12 +56,11 @@ arid_eda <- function(df, response, response_type = 'numeric', features = c()){
 
     if (response_type == 'numeric'){
         for (i in 1:length(cols)) {
-            p1 <- eval(substitute(
-                ggplot2::ggplot(data=filtered_df, ggplot2::aes_string(x=cols[i])) +
-                  ggplot2::geom_histogram(fill="lightgreen", stat='count') +
-                  ggplot2::xlab(colnames(cols)[i]) +
-                  ggplot2::ggtitle(cols[i])
-            ,list(i = i)))
+            p1 <- ggplot2::ggplot(data=filtered_df, ggplot2::aes_string(x=cols[i])) +
+                ggplot2::geom_histogram(fill="lightgreen", stat='count', binwidth = 20) +
+                ggplot2::xlab(colnames(cols)[i]) +
+                ggplot2::ggtitle(cols[i])
+            myplots[[i]] <- p1
             myplots[[i]] <- p1
         }
 
@@ -71,6 +72,8 @@ arid_eda <- function(df, response, response_type = 'numeric', features = c()){
         }
     }
 
-    myplots[[length(cols)+1]] <- GGally::ggcorr(filtered_df, label=TRUE) + ggplot2::ggtitle('Correlation Matrix')
+    corr_df <- filtered_df %>%  dplyr::select(where(is.numeric))
+
+    myplots[[length(cols)+1]] <- GGally::ggcorr(corr_df, label=TRUE) + ggplot2::ggtitle('Correlation Matrix')
     myplots
 }
