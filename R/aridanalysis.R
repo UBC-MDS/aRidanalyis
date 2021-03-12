@@ -29,27 +29,13 @@ arid_eda <- function(data_frame, response, response_type, features=c())
 #'
 #'@examples
 #'arid_linreg(df, income)
-arid_linreg <- function(df, response, features=c(), regularization=NULL, lambda=NULL) {
+arid_linreg <- function(regularization=NULL, lambda=NULL) {
     
   thisEnv <- environment()
   assign("regularization_", regularization, thisEnv)
   assign("lambda_", lambda, thisEnv)
-
-  y <- df %>%
-    dplyr::select({{response}}) %>%
-    as.matrix()
-    
-  cat_features <- tdf %>%
-    dplyr::select(-y) %>%
-    dplyr::select_if(is.character) %>%
-    data.matrix()
-
-  numeric_features <- tdf %>%
-    dplyr::select(-y) %>%
-    dplyr::select_if(is.numeric) %>%
-    as.matrix()
-    
-  X <- cbind(cat_features, numeric_features)
+  assign("intercept_", NULL, thisEnv)
+  assign("coef_", NULL, thisEnv)
     
   get_coefs <- function(X, y, model, lambda) {
     coef_ <- NULL
@@ -64,33 +50,29 @@ arid_linreg <- function(df, response, features=c(), regularization=NULL, lambda=
     return(coefs)
   }
     
-  set_coefs <- function(coefs, lambda) {
-    assign("intercept_", coefs[1], thisEnv)
-    assign("coef_", coefs[c(-1)], thisEnv)
-  }
-    
   fit <- function(X, y) {
     model <- NULL
-    regularization <- regularization_
-    lambda <- lambda_
-    if(is.null(regularization)) {
+    if(is.null(regularization_)) {
       lambda <- 0
-      model <- glmnet::glmnet(X, y, family = 'gaussian', alpha = 1, lambda = lambda)
+      model <- glmnet::glmnet(X, y, family = 'gaussian', alpha = 1, lambda = lambda_)
     }
     else if(regularization == c("L1")) {
-      model <- glmnet::glmnet(X, y, alpha = 1, family = 'gaussian')
+      model <- glmnet::glmnet(X, y, alpha = 1, family = 'gaussian', lambda = lambda_)
     }
     else if(regularization == c("L2")) {
-      model <- glmnet::glmnet(X, y, alpha = 0, family = 'gaussian')
+      model <- glmnet::glmnet(X, y, alpha = 0, family = 'gaussian', lambda = lambda_)
     }
     else if(regularization == c("L1L2")) {
-      model <- glmnet::glmnet(X, y, alpha = 0.5, family = 'gaussian')
+      model <- glmnet::glmnet(X, y, alpha = 0.5, family = 'gaussian', lambda = lambda_)
     }
   
-    coefs <- get_coefs(X, y, model, lambda)
-    set_coefs(coefs) 
+    coefs <- get_coefs(X, y, model, lambda_)
+
+    arid_linreg$intercept_ <- coefs[1]
+    arid_linreg$coef_ <- coefs[c(-1)]
+    assign("model_", model, thisEnv)
         
-    return(model)
+    return(arid_linreg)
   }
     
   predict <- function(newx) {
@@ -100,9 +82,6 @@ arid_linreg <- function(df, response, features=c(), regularization=NULL, lambda=
   score <- function() {
     model_$dev.ratio
   }
-  
-  model <- fit(X, y)
-  assign("model_", model, thisEnv)
  
   arid_linreg <- list(
     thisEnv = thisEnv,
