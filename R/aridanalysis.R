@@ -8,27 +8,29 @@
 #'@param lambda the regularization strength parameter to use (optional)
 #'
 #'@returns a class object after fitting a 'binomial' or 'multinomial' logistic regression model
-#'
+#'@export
 #'@examples
-#'model <- arid_logreg(X, y, regularization="L2")
-#'model$coef_
-#'model$intercept_
-#'model$score()
-#'model$predict(newx)
+#'X <- matrix(rnorm(40 * 3), 40, 3)
+#'y <- sample(c(0,1), 40, replace = TRUE)
+#'arid_logreg(X, y)
 arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
-    
+
     # initializing environment
     thisEnv <- environment()
+
+  # setting environment function
+  set_properties <- function(regularization, lambda) {
     assign("regularization_", regularization, thisEnv)
     assign("lambda_", lambda, thisEnv)
-    
+  }
+
+  set_properties(regularization, lambda)
+
     # testing some inputs
     if (class(y) != 'numeric'){
         stop("response must be numeric (i.e. class(y)=='numeric')")
     }
-    if (!is.matrix(X) | is_empty(X)){
-        stop("The input X must be a non-empty matrix")
-    }
+
     if (length(regularization) > 0 ){
         if (!(regularization %in% c("L1", "L2", "L1L2", NULL))) {
             stop("The regularization parameter should be either 'L1', 'L2', 'L1L2' or NULL")
@@ -37,7 +39,7 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
     if (length(unique(y)) < 2){
         stop('response must contain at least two unique values')
     }
-    
+
     # assigning the family based on response input (y)
     if (length(unique(y)) == 2){
         family <- "binomial"
@@ -45,8 +47,8 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
     else {
         family <- "multinomial"
     }
-    
-  # function to get the coefficients  
+
+  # function to get the coefficients
   get_coefs <- function(X, y, model, lambda) {
     coef_ <- NULL
     if (is.null(lambda)) {
@@ -59,13 +61,13 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
     assign("lambda_", lambda, thisEnv)
     return(coefs)
   }
-  
+
   # function to assign intercept and coefficients
   set_coefs <- function(coefs, lambda) {
     assign("intercept_", coefs[1], thisEnv)
     assign("coef_", coefs[c(-1)], thisEnv)
   }
-  
+
   #fit function depending on regularization, lamda and family
   fit <- function(X, y) {
     model <- NULL
@@ -84,19 +86,19 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
     else if(regularization == c("L1L2")) {
       model <- glmnet::glmnet(X, y, alpha = 0.5, family = family)
     }
-  
+
     coefs <- get_coefs(X, y, model, lambda)
-    set_coefs(coefs) 
-        
+    set_coefs(coefs)
+
     return(model)
   }
-  
+
   # predict function for binomial
   predict <- function(newx) {
       if(family == 'binomial'){
          prob <- glmnet::predict.glmnet(model_, s = lambda_, newx = newx, type="response")
          pred <- ifelse(prob > 0.5,1,0)
-         return(pred) 
+         return(pred)
       }
       else {
          return("Only predictions for binomial logistic regression are available")
@@ -107,11 +109,11 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
   score <- function() {
     model_$dev.ratio
   }
-  
+
   # calling fit function and assigning model to env
   model <- fit(X, y)
   assign("model_", model, thisEnv)
- 
+
   # setting up the model class attributes
   arid_logreg <- list(
     thisEnv = thisEnv,
@@ -121,8 +123,8 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
     intercept_ = intercept_,
     coef_ = coef_
   )
-  
-  # returning the class model  
+
+  # returning the class model
   class(arid_logreg) <- "arid_logreg"
   return(arid_logreg)
 }
