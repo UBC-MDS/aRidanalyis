@@ -1,6 +1,3 @@
-library(dplyr)
-library(glmnet)
-
 #' Function that builds an aRid_linreg class model object that provides sklearn
 #' linear regression interface functionality and attributes. The aRid_linreg
 #' function instantiates a linear regression model type based on the input
@@ -13,8 +10,10 @@ library(glmnet)
 #'
 #'@returns an aRid_linreg class linear regression model object
 #'
+#'@export
+#'
 #'@examples
-#' model <- aRid_linreg('L1', 1)
+#'aRid_linreg()
 aRid_linreg <- function(regularization=NULL, lambda=NULL) {
 
   # Validate initialization inputs

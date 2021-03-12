@@ -1,16 +1,14 @@
-library(tidyverse)
-
-linear_df <- tibble(x1 = c(1,0,0),
-                    x2 = c(0, 1.0, 0),
-                    x3 = c(0,0,1),
-                    x4 = c('a','a','b'),
-                    y = c(1,3,-1.0))
+linear_df <- dplyr::tibble(x1 = c(1,0,0),
+                           x2 = c(0, 1.0, 0),
+                           x3 = c(0,0,1),
+                           x4 = c('a','a','b'),
+                           y = c(1,3,-1.0))
 X <- linear_df %>%
-  select(-y) %>%
-  select_if(is.numeric) %>%
+  dplyr::select(-y) %>%
+  dplyr::select_if(is.numeric) %>%
   data.matrix()
 y <- linear_df %>%
-  select(y) %>%
+  dplyr::select(y) %>%
   as.matrix()
 
 # Test for aRid_linreg() invalid constructor inputs
@@ -25,8 +23,8 @@ testthat::test_that('Incorrect linear regression model constructor inputs', {
 testthat::test_that('Incorrect linear regression model fit inputs', {
   expect_error(aRid_linreg()$fit(NULL, y))
   expect_error(aRid_linreg()$fit(X, NULL))
-  expect_warning(aRid_linreg()$fit(select(linear_df, x1:x4), y))
-  expect_warning(aRid_linreg()$fit(X, select(linear_df, y)))
+  expect_warning(aRid_linreg()$fit(dplyr::select(linear_df, x1:x4), y))
+  expect_warning(aRid_linreg()$fit(X, dplyr::select(linear_df, y)))
   expect_error(aRid_linreg()$fit(X, c('a','b','c')))
   expect_error(aRid_linreg()$fit(X, c(0,1)))
 })
@@ -56,7 +54,7 @@ testthat::test_that('Range of valid regularization and lambda inputs', {
 })
 
 testthat::test_that('Test correct results of model fitting', {
-  expect_true(length(aRid_linreg()$fit(as.matrix(select(linear_df, x1:x2)), y)$coef_) == 2)
+  expect_true(length(aRid_linreg()$fit(as.matrix(dplyr::select(linear_df, x1:x2)), y)$coef_) == 2)
   expect_true(length(aRid_linreg("L1L2")$fit(X, y)$coef_) == 3)
   expect_equal(aRid_linreg()$fit(X, y)$intercept_, 1, tolerance = 5e-3)
   expect_true(all(aRid_linreg('L1')$fit(X, y)$predict(X) == matrix(1, nrow = 3, ncol = 1)))
