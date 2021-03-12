@@ -1,12 +1,15 @@
-library(tidyverse)
-bad_health_df <- read.csv(here::here('tests/toy_data', 'badhealth2.csv'))
-y <- bad_health_df$numvisit
-X <- bad_health_df[-1]
-
-
 
 # Test for incorrect model type inputs.
 testthat::test_that('Incorrect model type specification should generate error', {
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
   expect_error(aRid_countreg(X,y, model="aditive"))
   expect_error(aRid_countreg(X,y, model="interact", verbose=1))
   expect_error(aRid_countreg(X,y, model= 0 , verbose=0))
@@ -14,12 +17,30 @@ testthat::test_that('Incorrect model type specification should generate error', 
 })
 
 testthat::test_that('Empty or non-dataframe structures as X generate error', {
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
   expect_error(aRid_countreg(data.frame(),y, model="additive"))
   expect_error(aRid_countreg(list(1,2,3,4),y))
   expect_error(aRid_countreg(TRUE,y, model="interactive", verbose=1))
 })
 
 testthat::test_that('Empty or non-integer vectors as y  generate error', {
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
   expect_error(aRid_countreg(X,y +0.2, model="additive"))
   expect_error(aRid_countreg(X,as.character(y), model="interactive"))
   expect_error(aRid_countreg(X,as.logical(y), verbose=1))
@@ -27,12 +48,30 @@ testthat::test_that('Empty or non-integer vectors as y  generate error', {
 })
 
 testthat::test_that('Generate error when dimensions of X and y do not match', {
-  expect_error(aRid_countreg(X,y[1:200], model="additive"))
-  expect_error(aRid_countreg(X[1:700,],y, model="interactive"))
-  expect_error(aRid_countreg(X[1:801,],y[1:800], verbose=1))
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
+  expect_error(aRid_countreg(X,y[1:3], model="additive"))
+  expect_error(aRid_countreg(X[1:4,],y, model="interactive"))
+  expect_error(aRid_countreg(X[1:3,],y[1:2], verbose=1))
 })
 
 testthat::test_that('Non-logical inputs shoulg generate an error', {
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
   expect_error(aRid_countreg(X,y, verbose = "fail" ))
   expect_error(aRid_countreg(X,y, fit_intercept="incorrect"))
   expect_error(aRid_countreg(X,y, verbose=NULL))
@@ -40,6 +79,15 @@ testthat::test_that('Non-logical inputs shoulg generate an error', {
 })
 
 testthat::test_that('Incorrect values for significance generate error', {
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
   expect_error(aRid_countreg(X,y,alpha= 0L ))
   expect_error(aRid_countreg(X,y, alpha= 21.33))
   expect_error(aRid_countreg(X,y,alpha= FALSE))
@@ -48,10 +96,28 @@ testthat::test_that('Incorrect values for significance generate error', {
 
 # Test for incorrect model outputs.
 testthat::test_that('Output should be of class aRid_countreg', {
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
   expect_identical(class(aRid_countreg(X,y, model="additive")), "aRid_countreg")
   expect_identical(mode(aRid_countreg(X,y, model="additive")), "list")
 })
 testthat::test_that('Output should be of the correct length', {
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
   expect_equal(length(aRid_countreg(X,y, model="additive")$p_values_), 2)
   expect_equal(length(aRid_countreg(X,y, model="interactive")$coef_), 3)
   expect_identical(aRid_countreg(X,y, model = "additive",
@@ -60,23 +126,60 @@ testthat::test_that('Output should be of the correct length', {
 
 })
 testthat::test_that('Incorrect model types and classes should give error', {
-  expect_identical(class(aRid_countreg(X,y, model="additive")$count_model_)[2], "glm")
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
+  expect_identical(class(aRid_countreg(X,y, model="additive")$count_model_)[1], "glm")
   expect_identical(mode(aRid_countreg(X,y, model="interactive")$count_model_),"list")
 })
 
 testthat::test_that('Incorrect integration of significance throws error', {
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
   expect_equal(aRid_countreg(X,y, model="additive", alpha=0.1)$alpha_, 0.1)
   expect_equal(aRid_countreg(X,y, model="additive")$alpha_, 0.05)
 
 })
 
 testthat::test_that('Incorrect integration of family throws error', {
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
   expect_identical(aRid_countreg(X,y, model="additive", alpha=0.1)$family_,
-                   "negative binomial")
+                   "poisson")
+
 
 })
 
 testthat::test_that('Incorrect integration of model type throws error ', {
+  X <- tibble::tribble(
+    ~badh,    ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
   expect_identical(aRid_countreg(X,y, model="additive", alpha=0.1)$type_,
                    "additive")
 
@@ -84,9 +187,18 @@ testthat::test_that('Incorrect integration of model type throws error ', {
 })
 
 testthat::test_that('Test correct results of predict function', {
-  new_X <- tibble(badh = c("bad"), age=c(59))
+  X <- tibble::tribble(
+    ~badh,     ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L)
+  new_X <- tibble::tibble(badh = c("bad"), age=c(59))
   a <- aRid_countreg(X,y, model = "additive")
-  expect_equal(a$predict_count(a$count_model_, new_X)[[1]],6.83, tolerance=5e-3)
+  expect_equal(a$predict_count(a$count_model_, new_X)[[1]],22.19, tolerance=5e-3)
 
 
 })
