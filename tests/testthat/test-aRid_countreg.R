@@ -1,14 +1,7 @@
 library(tidyverse)
-
-
-bad_health_df <- read.csv("tests/toy_data/badhealth.csv") %>%
-  mutate(badh = case_when(badh == 0 ~ "good",
-                          badh == 1 ~ "bad"),
-         badh = as.factor(badh))
-bad_health_df <- bad_health_df[-1]
+bad_health_df <- read.csv(here::here('tests/toy_data', 'badhealth2.csv'))
 y <- bad_health_df$numvisit
 X <- bad_health_df[-1]
-
 
 
 
@@ -80,7 +73,6 @@ testthat::test_that('Incorrect integration of significance throws error', {
 testthat::test_that('Incorrect integration of family throws error', {
   expect_identical(aRid_countreg(X,y, model="additive", alpha=0.1)$family_,
                    "negative binomial")
-
 
 })
 
