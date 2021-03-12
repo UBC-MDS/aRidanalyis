@@ -1,3 +1,12 @@
+library(testthat)
+library(tidyverse)
+library(palmerpenguins)
+library(ggplot2)
+library(GGally)
+library(grid)
+library(dplyr)
+library(glmnet)
+
 #' Function to create summary statistics and basic EDA plots. Given a data frame,
 #' this function outputs general exploratory analysis plots as well as basic
 #' statistics summarizing trends in the features of the input data.
@@ -32,35 +41,46 @@ arid_eda <- function(df, response, response_type, features=c())
 arid_linreg <- function(df, response, features=c(), regularization=NULL, alpha = c(1))
 
 #' Given a matrix X of explanatory variables, a response y numeric variable,
-#' this function fits a logistic regression model, either "binomial" or "multinomial"
+#' this function fits either a 'binomial' or 'multinomial' logistic regression model
+#' and returns a class object similar to sci-kit learn's object
 #'
 #'@param X the explanatory variables matrix
 #'@param y the response variable numeric vector
 #'@param regularization what level of regularization to use in the model (optional)
 #'@param lambda the regularization strength parameter to use (optional)
 #'
-#'@returns either a "binomial" or "multinomial" logistic regression model wrapped in an sklearn style class
+#'@returns a class object after fitting a 'binomial' or 'multinomial' logistic regression model
 #'
 #'@examples
-#'arid_logreg(X, y, regularization="L2")
+#'model <- arid_logreg(X, y, regularization="L2")
+#'model$coef_
+#'model$intercept_
+#'model$score()
+#'model$predict(newx)
 arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
     
+    # initializing environment
     thisEnv <- environment()
     assign("regularization_", regularization, thisEnv)
     assign("lambda_", lambda, thisEnv)
     
+    # testing some inputs
     if (class(y) != 'numeric'){
         stop("response must be numeric (i.e. class(y)=='numeric')")
     }
-    
+    if (!is.matrix(X) | is_empty(X)){
+        stop("The input X must be a non-empty matrix")
+    }
+    if (length(regularization) > 0 ){
+        if (!(regularization %in% c("L1", "L2", "L1L2", NULL))) {
+            stop("The regularization parameter should be either 'L1', 'L2', 'L1L2' or NULL")
+        }
+    }
     if (length(unique(y)) < 2){
         stop('response must contain at least two unique values')
     }
     
-    if (regularization %in% c("L1", "L2", "L1L2", "NULL") == FALSE){
-        stop("regularization parameter must be 'L1', 'L2', 'L1L2', or 'NULL'")
-    }
-    
+    # assigning the family based on response input (y)
     if (length(unique(y)) == 2){
         family <- "binomial"
     }
@@ -68,6 +88,7 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
         family <- "multinomial"
     }
     
+  # function to get the coefficients  
   get_coefs <- function(X, y, model, lambda) {
     coef_ <- NULL
     if (is.null(lambda)) {
@@ -80,12 +101,14 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
     assign("lambda_", lambda, thisEnv)
     return(coefs)
   }
-    
+  
+  # function to assign intercept and coefficients
   set_coefs <- function(coefs, lambda) {
     assign("intercept_", coefs[1], thisEnv)
     assign("coef_", coefs[c(-1)], thisEnv)
   }
-    
+  
+  #fit function depending on regularization, lamda and family
   fit <- function(X, y) {
     model <- NULL
     regularization <- regularization_
@@ -109,18 +132,29 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
         
     return(model)
   }
-    
+  
+  # predict function for binomial
   predict <- function(newx) {
-    return(glmnet::predict.glmnet(model_, s = lambda_, newx = newx)[1])
+      if(family == 'binomial'){
+         prob <- glmnet::predict.glmnet(model_, s = lambda_, newx = newx, type="response")
+         pred <- ifelse(prob > 0.5,1,0)
+         return(pred) 
+      }
+      else {
+         return("Only predictions for binomial logistic regression are available")
+      }
   }
-    
+
+  # score function
   score <- function() {
     model_$dev.ratio
   }
   
+  # calling fit function and assigning model to env
   model <- fit(X, y)
   assign("model_", model, thisEnv)
  
+  # setting up the model class attributes
   arid_logreg <- list(
     thisEnv = thisEnv,
     fit = fit,
@@ -129,7 +163,8 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
     intercept_ = intercept_,
     coef_ = coef_
   )
-    
+  
+  # returning the class model  
   class(arid_logreg) <- "arid_logreg"
   return(arid_logreg)
 }
