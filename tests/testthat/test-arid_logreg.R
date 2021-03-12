@@ -1,14 +1,8 @@
-library(testthat)
-library(tidyverse)
-library(glmnet)
-
 # creating toy data
 set.seed(2021)
 X <- matrix(rnorm(40 * 3), 40, 3)
 xnew <- matrix(rnorm(10*3), 10, 3)
 y <- sample(c(0,1), 40, replace = TRUE)
-y0 <- rep(1, 40)
-y3 <- sample(c(0,1,2), 40, replace = TRUE)
 y2 <- sample(c(0,1,"3"), 40, replace = TRUE)
 
 # Test for incorrect regularization inputs.
@@ -60,19 +54,19 @@ testthat::test_that('Test correct results of score function', {
 })
 
 # Test for intercept_
-testthat::test_that('Test correct results of score function', {
+testthat::test_that('Test correct results of intercept_ attribute', {
   expect_equal((arid_logreg(X, y))$intercept_,0.3714, tolerance=5e-3)
 })
 
 # Test for coef_
-testthat::test_that('Test correct results of score function', {
+testthat::test_that('Test correct results of coef_ attribute', {
   expect_equal(((arid_logreg(X, y))$coef_)[1],0.2438, tolerance=5e-3)
   expect_equal(((arid_logreg(X, y))$coef_)[2],-0.0186, tolerance=5e-3)
   expect_equal(((arid_logreg(X, y))$coef_)[3],0.1248, tolerance=5e-3)
 })
 
-# Test for coef_
-testthat::test_that('Test correct results of score function', {
+# Test for predict
+testthat::test_that('Test correct results of predict function', {
   expect_identical(((arid_logreg(X, y))$predict(xnew))[1], 0)
   expect_identical(((arid_logreg(X, y))$predict(xnew))[3], 0)
   expect_identical(((arid_logreg(X, y))$predict(xnew))[5], 1)
