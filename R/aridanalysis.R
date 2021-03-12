@@ -1,59 +1,97 @@
-#' Function to create summary statistics and basic EDA plots. Given a data frame,
-#' this function outputs general exploratory analysis plots as well as basic
-#' statistics summarizing trends in the features of the input data.
+library(dplyr)
+library(glmnet)
+
+#' Function that builds an aRid_linreg class model object that provides sklearn
+#' linear regression interface functionality and attributes. The aRid_linreg
+#' function instantiates a linear regression model type based on the input
+#' specifications and provides methods to fit/predict/score the results and
+#' retrieve sklearn attributes.
 #'
-#'@param data_frame the input dataframe to analyze
-#'@param response the column name of the response variable
-#'@param response_type string indiating if response is 'categorical' or 'continuous'
-#'@param features a list of explanatory variable column names
+#'@param regularization A string defining NULL,'L1','L2', or 'L1L2'
+#'       linear coefficient regularization
+#'@param lambda the numeric regularization strength value
 #'
-#'@returns a dataframe with a list of features and their coefficients
-#'@reutrns a ggplot object containing the EDA
+#'@returns an aRid_linreg class linear regression model object
 #'
 #'@examples
-#'arid_eda(house_prices, 'price', 'continuous, c('rooms', 'age','garage')
-arid_eda <- function(data_frame, response, response_type, features=c())
+#' model <- aRid_linreg('L1', 1)
+aRid_linreg <- function(regularization=NULL, lambda=NULL) {
 
+  # Validate initialization inputs
+  if (!is.null(regularization)) {
+    if (!is.null(regularization) & !is.character(regularization)) {
+      stop('ERROR: regularization input must be a character vector')
+    }
+    if (!is.null(regularization) & !(regularization %in% c(NULL, "L1", "L2", "L1L2"))) {
+      stop('ERROR: Invalid regularization input value')
+    }
+  }
 
-#' Function that performs a linear regression on continuous response data.
-#' This function will fit a linear regression model on the input dataframe
-#' using the response supplied and provide skLearn interface functionality
-#'
-#'@param data_frame the input dataframe to analyze
-#'@param response the column name of the response variable
-#'@param features a list of explanatory variable column names
-#'@param regularization what level of regularization to use in the model (optional)
-#'@param lambda the regularization strength parameter to use (optional)
-#'
-#'@returns a linear regression model wrapped in an sklearn style class
-#'
-#'@examples
-#'arid_linreg(df, income)
-arid_linreg <- function(regularization=NULL, lambda=NULL) {
-    
+  if (!is.null(lambda)) {
+    if (!is.numeric(lambda)) {
+      stop('ERROR: lambda input must be a numeric vector')
+    }
+    if (length(lambda) > 1) {
+      stop('ERROR: lambda input must single value')
+    }
+  }
+
+  # Create an environment to allow class-wide variables
   thisEnv <- environment()
   assign("regularization_", regularization, thisEnv)
   assign("lambda_", lambda, thisEnv)
   assign("intercept_", NULL, thisEnv)
   assign("coef_", NULL, thisEnv)
-    
-  get_coefs <- function(X, y, model, lambda) {
+
+  # Private method to get the coefficients from the fit model
+  .get_coefs <- function(X, y, model, lambda) {
     coef_ <- NULL
+    # If lambda is not specified, return lowest error lambda
     if (is.null(lambda)) {
-      lambda <- glmnet::cv.glmnet(X, y)$lambda.min
+      lambda <- glmnet::cv.glmnet(X, y, grouped=FALSE)$lambda.min
       coefs <- glmnet::coef.glmnet(model, s = lambda)
     }
     else {
       coefs <- glmnet::coef.glmnet(model, s = lambda)
     }
+    # Store the lowest error lambda in instance
     assign("lambda_", lambda, thisEnv)
     return(coefs)
   }
-    
+
+  # aRid_linreg::fit method to fit input sample regression model
   fit <- function(X, y) {
+    # Validate fit inputs
+    if (is.null(X) | length(X) < 1) {
+      stop('ERROR: Invalid input X feature values to fit')
+    }
+    if (is.null(y) | length(y) < 1) {
+      stop('ERROR: Invalid input y response value to fit')
+    }
+    if (is.list(X)) {
+      if (length(dplyr::select_if(X, is.numeric) != length(X))) {
+        warning('WARNING: Dropping non-numeric input features in X')
+        X <- X %>%
+          dplyr::select_if(is.numeric)
+      }
+      X <- data.matrix(X)
+    }
+    if (is.list(y)) {
+      warning('WARNING: Input y to fit is a list, converting to matrix')
+      y <- as.matrix(y)
+    }
+    if (!is.numeric(y)) {
+      stop('ERROR: Response y is not numeric')
+    }
+    if (nrow(X) != nrow(y)) {
+      print(length(X))
+      stop('ERROR: Input features X and response y not the same length')
+    }
+
+    # Fit the model family according to specifications
     model <- NULL
     if(is.null(regularization_)) {
-      lambda <- 0
+      lambda_ <- 0
       model <- glmnet::glmnet(X, y, family = 'gaussian', alpha = 1, lambda = lambda_)
     }
     else if(regularization == c("L1")) {
@@ -65,25 +103,46 @@ arid_linreg <- function(regularization=NULL, lambda=NULL) {
     else if(regularization == c("L1L2")) {
       model <- glmnet::glmnet(X, y, alpha = 0.5, family = 'gaussian', lambda = lambda_)
     }
-  
-    coefs <- get_coefs(X, y, model, lambda_)
 
-    arid_linreg$intercept_ <- coefs[1]
-    arid_linreg$coef_ <- coefs[c(-1)]
+    # Get the coefficients from the fit model
+    coefs <- .get_coefs(X, y, model, lambda_)
+
+    # Store class object
+    aRid_linreg$intercept_ <- coefs[1]
+    aRid_linreg$coef_ <- coefs[c(-1)]
+    assign("coef_", coefs[c(-1)], thisEnv)
     assign("model_", model, thisEnv)
-        
-    return(arid_linreg)
+
+    # Return updated arid_linreg model
+    return(aRid_linreg)
   }
-    
+
+  # aRid_linreg::predict method on new samples
   predict <- function(newx) {
-    return(glmnet::predict.glmnet(model_, s = lambda_, newx = newx)[1])
+    if (is.null(newx) | length(newx) < 1) {
+      stop('ERROR: Invalid input new X sample values to predict')
+    }
+    if (is.null(model_)) {
+      stop('ERROR: Must fit model before predicting')
+    }
+    if (length(coef_) != ncol(newx)) {
+      stop('ERROR: Incorrect number of features in newx samples')
+    }
+
+    # Return the predicted values of the input samples
+    return(glmnet::predict.glmnet(model_, s = lambda_, newx = newx))
   }
-    
+
+  # aRid_linreg::score method to return rsquared score of training samples
   score <- function() {
-    model_$dev.ratio
+    if (is.null(model_)) {
+      stop('ERROR: Must fit model before scoring')
+    }
+    max(model_$dev.ratio)
   }
- 
-  arid_linreg <- list(
+
+  # Define the elements of the aRid_linreg model class
+  aRid_linreg <- list(
     thisEnv = thisEnv,
     fit = fit,
     predict = predict,
@@ -91,45 +150,8 @@ arid_linreg <- function(regularization=NULL, lambda=NULL) {
     intercept_ = intercept_,
     coef_ = coef_
   )
-    
-  class(arid_linreg) <- "arid_linreg"
-  return(arid_linreg)
+
+  # Return the aRid_linreg model class type
+  class(aRid_linreg) <- "aRid_linreg"
+  return(aRid_linreg)
 }
-
-#' Given a data frame, a response variable and explanatory variables (features),
-#' this function fits a logistic regression and outputs the statistical summary
-#' including the interpretation.
-#'
-#'@param data_frame the input dataframe to analyze
-#'@param response the column name of the response variable
-#'@param features a list of explanatory variable column names
-#'@param type a string indicating classification type. Either "binomial", "ordinal" or "multinomial"
-#'@param model A string indicating the model type. Either "additive" or "interactive"
-#'@param polynomial a boolean indicating whether polynomial features should be considered or not
-#'@param alpha significance level for analysis
-#'
-#'@returns dataframe with 4 columns: 'features', 'p-value', 'significant', 'interpretation'
-#'
-#'@examples
-#'arid_logreg(df, 'target', ['feat1', 'feat2', 'feat3'], type="multinomial",
-#' model="interactive", polynomial=True, alpha=0.01)
-arid_logreg <- function(data_frame, response, features=c(), type="binomial", model="additive", polynomial=False, alpha=0.05)
-
-
-#' A function that performs linear regression on counting data when the response is
-#' restricted to be positive and natural. This function will perform count regression
-#' to the specified columns    of a data frame and return a substantial inferential analysis.
-#'
-#'@param data_frame the input dataframe to analyze
-#'@param response the column name of the response variable
-#'@param features a list of explanatory variable column names
-#'@param type a string indicating classification type. Either "binomial", "ordinal" or "multinomial"
-#'@param model A string indicating the model type. Either "additive" or "interactive"
-#'@param alpha significance level for analysis
-#'
-#'@returns dataframe with 4 columns: 'features', 'p-value', 'significant', 'interpretation'
-#'@returns a string family was used in the generalized linear regression model based on an overdispersion and fitting analysis
-#'
-#'@examples
-#'aridanalysis.arid_countreg(df, income, features = [feat1, feat5] ,"additive")
-arid_countreg <- function(data_frame, response, features=c(), model="additive", polynomial=False, alpha=0.05)
