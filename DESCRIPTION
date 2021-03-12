@@ -19,8 +19,15 @@ Imports:
     glmnet,
     palmerpenguins,
     ggplot2,
-    GGally
+    GGally,
+    tidyverse,
+    MASS,
+    broom,
+    AER,
+    tibble,
+    rlang,
+    stringr
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-Imports: tidyverse, testthat, MASS, broom, palmerpenguins, GGally, AER, tibble, purrr
+
