@@ -1,13 +1,21 @@
 Package: aRidanalysis
-Title: What the Package Does (One Line, Title Case)
+Title: DRY out your regression analysis!
 Version: 0.0.0.9000
 Authors@R: 
+    person(given = "Santiago",
+           family = "Rugeles Schoonewolff",
+           role = c("aut", "cre"))
+    person(given = "Daniel",
+           family = "Ortiz Nunez",
+           role = c("aut", "cre"))
     person(given = "First",
            family = "Last",
+           role = c("aut", "cre"))
+    person(given = "Craig",
+           family = "McLaughlin",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "cswag7@student.ubc.ca")
+Description: The aRidanalysis package allows users to streamline their regression analysis by providing functions that return model objects with familiar sklearn interfaces. An EDA function and model functions for different regression analysis response types are provided to simplify the analysis and modelling process and reduce code duplication. These model objects will allow users to leverage the inference capabilities of the R ecosystem with the prediction pipelines familiar in Python.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

@@ -2,13 +2,13 @@
 #' this function outputs general exploratory analysis plots as well as basic
 #' statistics summarizing trends in the features of the input data.
 #'
-#'@param data_frame the input data frame to analyze
-#'@param response the column name of the response variable
-#'@param response_type string indicating if response is 'categorical' or 'continuous'
-#'@param features a list of explanatory variable column names
+#'@param df (data frame): the input data frame to analyze
+#'@param response (character): the column name of the response variable
+#'@param response_type (character): string indicating if response is 'categorical' or 'continuous' (default: 'numeric')
+#'@param features (list<string>): a list of explanatory variable column names (default: c())
 #'
-#'@returns a data frame with a list of features and their coefficients
-#'@returns a ggplot object containing the EDA
+#'@returns data frame: a data frame with a list of features and their coefficients
+#'@returns plot: a ggplot object containing the EDA
 #'
 #'@export
 #'
@@ -71,27 +71,27 @@ arid_eda <- function(df, response, response_type = 'numeric', features = c()){
 }
 
 
-#' Function that builds an aRid_linreg class model object that provides sklearn
-#' linear regression interface functionality and attributes. The aRid_linreg
+#' Function that builds an arid_linreg class model object that provides sklearn
+#' linear regression interface functionality and attributes. The arid_linreg
 #' function instantiates a linear regression model type based on the input
 #' specifications and provides methods to fit/predict/score the results and
 #' retrieve sklearn attributes.
 #'
 #'
-#'@param regularization A string defining NULL,'L1','L2', or 'L1L2'
-#'       linear coefficient regularization
-#'@param lambda the numeric regularization strength value
+#'@param regularization (character): A string defining NULL,'L1','L2', or 'L1L2'
+#'       linear coefficient regularization (default: NULL)
+#'@param lambda (double):the numeric regularization strength value
 #'
-#'@returns an aRid_linreg class linear regression model object
+#'@returns arid_linreg: an arid_linreg class linear regression model object
 #'
 #'@export
 #'
 #'@examples
-#'model <- aRid_linreg()
+#'model <- arid_linreg()
 #'model$fit(matrix(1:12, nrow = 3, ncol = 3), as.matrix(c(1,2,0)))
 #'model$predict(t(as.matrix(c(1,2,2))))
 #'model$score()
-aRid_linreg <- function(regularization=NULL, lambda=NULL) {
+arid_linreg <- function(regularization=NULL, lambda=NULL) {
 
   # Validate initialization inputs
   if (!is.null(regularization)) {
@@ -142,7 +142,7 @@ aRid_linreg <- function(regularization=NULL, lambda=NULL) {
     assign("coef_", coefs[c(-1)], thisEnv)
   }
 
-  # aRid_linreg::fit method to fit input sample regression model
+  # arid_linreg::fit method to fit input sample regression model
   fit <- function(X, y) {
     # Validate fit inputs
     if (is.null(X) | length(X) < 1) {
@@ -191,16 +191,16 @@ aRid_linreg <- function(regularization=NULL, lambda=NULL) {
     coefs <- .get_coefs(X, y, model, lambda_)
 
     # Store class object
-    aRid_linreg$intercept_ <- coefs[1]
-    aRid_linreg$coef_ <- coefs[c(-1)]
+    arid_linreg$intercept_ <- coefs[1]
+    arid_linreg$coef_ <- coefs[c(-1)]
     assign("coef_", coefs[c(-1)], thisEnv)
     assign("model_", model, thisEnv)
 
     # Return updated arid_linreg model
-    return(aRid_linreg)
+    return(arid_linreg)
   }
 
-  # aRid_linreg::predict method on new samples
+  # arid_linreg::predict method on new samples
   predict <- function(newx) {
     if (is.null(newx) | length(newx) < 1) {
       stop('ERROR: Invalid input new X sample values to predict')
@@ -216,7 +216,7 @@ aRid_linreg <- function(regularization=NULL, lambda=NULL) {
     return(glmnet::predict.glmnet(model_, s = lambda_, newx = newx))
   }
 
-  # aRid_linreg::score method to return rsquared score of training samples
+  # arid_linreg::score method to return rsquared score of training samples
   score <- function() {
     if (is.null(model_)) {
       stop('ERROR: Must fit model before scoring')
@@ -224,8 +224,8 @@ aRid_linreg <- function(regularization=NULL, lambda=NULL) {
     max(model_$dev.ratio)
   }
 
-  # Define the elements of the aRid_linreg model class
-  aRid_linreg <- list(
+  # Define the elements of the arid_linreg model class
+  arid_linreg <- list(
     thisEnv = thisEnv,
     fit = fit,
     predict = predict,
@@ -234,9 +234,9 @@ aRid_linreg <- function(regularization=NULL, lambda=NULL) {
     coef_ = coef_
   )
 
-  # Return the aRid_linreg model class type
-  class(aRid_linreg) <- "aRid_linreg"
-  return(aRid_linreg)
+  # Return the arid_linreg model class type
+  class(arid_linreg) <- "arid_linreg"
+  return(arid_linreg)
 }
 
 
@@ -244,12 +244,12 @@ aRid_linreg <- function(regularization=NULL, lambda=NULL) {
 #' this function fits either a 'binomial' or 'multinomial' logistic regression model
 #' and returns a class object similar to sci-kit learn's object
 #'
-#'@param X the explanatory variables matrix
-#'@param y the response variable numeric vector
-#'@param regularization what level of regularization to use in the model (optional)
-#'@param lambda the regularization strength parameter to use (optional)
+#'@param X (data frame): the explanatory variables matrix
+#'@param y (numeric): the response variable numeric vector
+#'@param regularization (character): what level of regularization to use in the model (default NULL)
+#'@param lambda (double): the regularization strength parameter to use (default: NULL)
 #'
-#'@returns a class object after fitting a 'binomial' or 'multinomial' logistic regression model
+#'@returns arid_logreg: a class object after fitting a 'binomial' or 'multinomial' logistic regression model
 #'
 #'@export
 #'@examples
@@ -373,27 +373,26 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
 }
 
 
-
 #' Function to create class object similar to sci-kit learn's object
 #' structure for inferential purposes. Given a data frame, the response,
 #' and certain specifications return a class object with a fit, predict and
 #' core functions as well as attributes obtained from the statistical analysis
 #'
-#'@param X the input data frame with the explanatory variables to fit the model.
-#'@param y an integer vector with the response to be fitted (only natural numbers).
-#'@param alpha  a double vector of length 1 indicating the significance level
-#'@param fit_intercept if the model should include the intercept (TRUE or FALSE).
-#'@param verbose if results should include a written explanation (TRUE or FALSE).
-#'@param model type of model to be fitted, either "additive" or "interactive".
-#'@param family distributional family to be used in generalized linear model.
+#'@param X (data_frame): the input data frame with the explanatory variables to fit the model.
+#'@param y (integer): an integer vector with the response to be fitted (only natural numbers).
+#'@param alpha (double): a double vector of length 1 indicating the significance level (default: 0.05)
+#'@param fit_intercept (logical): if the model should include the intercept (TRUE or FALSE). (default: FALSE)
+#'@param verbose (logical): if results should include a written explanation (TRUE or FALSE). (default: FALSE)
+#'@param model (character): type of model to be fitted, either "additive" or "interactive". (default: "additive")
+#'@param family (character): distributional family to be used in generalized linear model. (default: "poisson")
 #'
 #'@returns a class object with three methods and statistical attributes
 #'@export
 #'@examples
 #'X <- as.data.frame(matrix(rnorm(40 * 3), 40, 3))
 #'y <- sample(c(1:60), 40, replace = TRUE)
-#'aRid_countreg(X,y,0.1)
-aRid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, model="additive", family="poisson")
+#'arid_countreg(X,y,0.1)
+arid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, model="additive", family="poisson")
 {
 
 
@@ -512,7 +511,7 @@ aRid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, m
     return(tibble(In_Sample_Metric = c("AIC", "Deviance"),
                   Value = c(model$aic, model$deviance)))
   }
-  aRid_countreg <- list(
+  arid_countreg <- list(
     Env = Env,
     fit = fit,
     predict_count = predict_count,
@@ -528,7 +527,7 @@ aRid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, m
 
   )
 
-  class(aRid_countreg) <- "aRid_countreg"
-  return(aRid_countreg)
+  class(arid_countreg) <- "arid_countreg"
+  return(arid_countreg)
 
 }

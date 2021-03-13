@@ -9,18 +9,18 @@ statistics summarizing trends in the features of the input data.}
 arid_eda(df, response, response_type = "numeric", features = c())
 }
 \arguments{
-\item{response}{the column name of the response variable}
+\item{df}{(data frame): the input data frame to analyze}
 
-\item{response_type}{string indicating if response is 'categorical' or 'continuous'}
+\item{response}{(character): the column name of the response variable}
 
-\item{features}{a list of explanatory variable column names}
+\item{response_type}{(character): string indicating if response is 'categorical' or 'continuous' (default: 'numeric')}
 
-\item{data_frame}{the input data frame to analyze}
+\item{features}{(list<string>): a list of explanatory variable column names (default: c())}
 }
 \value{
-a data frame with a list of features and their coefficients
+data frame: a data frame with a list of features and their coefficients
 
-a ggplot object containing the EDA
+plot: a ggplot object containing the EDA
 }
 \description{
 Function to create summary statistics and basic EDA plots. Given a data frame,
