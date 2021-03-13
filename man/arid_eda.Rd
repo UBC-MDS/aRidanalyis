@@ -15,10 +15,10 @@ arid_eda(df, response, response_type = "numeric", features = c())
 
 \item{features}{a list of explanatory variable column names}
 
-\item{data_frame}{the input dataframe to analyze}
+\item{data_frame}{the input data frame to analyze}
 }
 \value{
-a dataframe with a list of features and their coefficients
+a data frame with a list of features and their coefficients
 
 a ggplot object containing the EDA
 }

@@ -87,7 +87,10 @@ arid_eda <- function(df, response, response_type = 'numeric', features = c()){
 #'@export
 #'
 #'@examples
-#'aRid_linreg()
+#'model <- aRid_linreg()
+#'model$fit(matrix(1:12, nrow = 3, ncol = 3), as.matrix(c(1,2,0)))
+#'model$predict(t(as.matrix(c(1,2,2))))
+#'model$score()
 aRid_linreg <- function(regularization=NULL, lambda=NULL) {
 
   # Validate initialization inputs
@@ -139,31 +142,6 @@ aRid_linreg <- function(regularization=NULL, lambda=NULL) {
     assign("coef_", coefs[c(-1)], thisEnv)
   }
 
-  #fit function depending on regularization, lamda and family
-  fit <- function(X, y) {
-    model <- NULL
-    regularization <- regularization_
-    lambda <- lambda_
-    if(is.null(regularization)) {
-      lambda <- 0
-      model <- glmnet::glmnet(X, y, family = family, alpha = 1, lambda = lambda)
-    }
-    else if(regularization == c("L1")) {
-      model <- glmnet::glmnet(X, y, alpha = 1, family = family)
-    }
-    else if(regularization == c("L2")) {
-      model <- glmnet::glmnet(X, y, alpha = 0, family = family)
-    }
-    else if(regularization == c("L1L2")) {
-      model <- glmnet::glmnet(X, y, alpha = 0.5, family = family)
-    }
-
-    coefs <- get_coefs(X, y, model, lambda)
-    set_coefs(coefs)
-
-    return(model)
-  }
-
   # aRid_linreg::fit method to fit input sample regression model
   fit <- function(X, y) {
     # Validate fit inputs
@@ -190,7 +168,7 @@ aRid_linreg <- function(regularization=NULL, lambda=NULL) {
     }
     if (nrow(X) != nrow(y)) {
       print(length(X))
-      stop('ERROR: Input features X and response y not the same length')
+      stop('ERROR: Input samples X and responses y not the same length')
     }
 
     # Fit the model family according to specifications
