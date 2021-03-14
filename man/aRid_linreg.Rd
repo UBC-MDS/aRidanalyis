@@ -27,5 +27,8 @@ specifications and provides methods to fit/predict/score the results and
 retrieve sklearn attributes.
 }
 \examples{
-aRid_linreg()
+model <- aRid_linreg()
+model$fit(matrix(1:12, nrow = 3, ncol = 3), as.matrix(c(1,2,0)))
+model$predict(t(as.matrix(c(1,2,2))))
+model$score()
 }
