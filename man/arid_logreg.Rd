@@ -9,16 +9,16 @@ and returns a class object similar to sci-kit learn's object}
 arid_logreg(X, y, regularization = NULL, lambda = NULL)
 }
 \arguments{
-\item{X}{the explanatory variables matrix}
+\item{X}{(data frame): the explanatory variables matrix}
 
-\item{y}{the response variable numeric vector}
+\item{y}{(numeric): the response variable numeric vector}
 
-\item{regularization}{what level of regularization to use in the model (optional)}
+\item{regularization}{(character): what level of regularization to use in the model (default NULL)}
 
-\item{lambda}{the regularization strength parameter to use (optional)}
+\item{lambda}{(double): the regularization strength parameter to use (default: NULL)}
 }
 \value{
-a class object after fitting a 'binomial' or 'multinomial' logistic regression model
+arid_logreg: a class object after fitting a 'binomial' or 'multinomial' logistic regression model
 }
 \description{
 Given a matrix X of explanatory variables, a response y numeric variable,
