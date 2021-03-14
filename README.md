@@ -4,7 +4,7 @@ DRY out your regression analysis!
 
 ## R Package for Inferential Regression and EDA Analysis!
 
-As Data Scientists, being able to perform Exploratory Data Analysis as well as Regression Analysis are paramount to the process of analyzing trends in data. Moreover, following the DRY (Do Not Repeat Yourself) principle is regarded as a majority priority for maximizing code quality. Yet, often times Data Scientists facing these tasks will start the entire process from scratch, wasting both time and effort while compromising code quality. The aridanalysis package strives to remedy this problem by giving users an easy-to-implement EDA function alongside 3 robust statistical tests that will simplify these analytical processes and produce an easy to read interpretation of the input data. Users will no longer have to write many lines of code to explore their data effectively. 
+As Data Scientists, being able to perform Exploratory Data Analysis as well as Regression Analysis are paramount to the process of analyzing trends in data. Moreover, following the DRY (Do Not Repeat Yourself) principle is regarded as a majority priority for maximizing code quality. Yet, often times Data Scientists facing these tasks will start the entire process from scratch, wasting both time and effort while compromising code quality. The aRidanalysis package strives to remedy this problem by giving users an easy-to-implement EDA function alongside 3 functions to generate statistical model classes that will simplify these analytical processes and produce an easy to read interpretation of the input data. Users will no longer have to write many lines of code to explore their data effectively! 
 
 ## Package Functions
 
@@ -14,19 +14,19 @@ This function takes in the data frame of interest and generates summary statisti
 
 ### `arid_linreg`
 
-This function takes in the data frame of interest and performs a regular linear regression with the given regularization and features. The function then outputs a regression model for prediction and an equivalent model to provide inference.
+This function takes in user specified linear regression model hyperparameters of interest and returns an arid_linreg class linear regression model with a sci-kit learn style interface. This model class has appropriate `fit`, `predict`, and `score` methods to provide linear regression analysis with the model specified.
 
 ### `arid_logreg`
 
-This function takes in a data frame and performs either binomial or multinomial classification based on user inputs. The function then outputs a logistic regression model for prediction and an equivalent model to provide inference.
+This function takes in a data frame of input features, a response vector, and regression model parameters to perform either a binomial or multinomial classification and returns an arid_logreg class logistic regression model with a sci-kit learn style interface. This model class has appropriate `fit`, `predict`, and `score` methods to provide logistic regression analysis with the model specified.
 
 ### `arid_countreg`
 
-This function takes a dataframe, its categorical and continuous variables and other user inputs to perform a Poisson regression. The function will return a Poisson regressor model for prediction and an equivalent model for inference purposes.
+This function takes a dataframe, its categorical and continuous variables and other user input parameters to return a fitted arid_countreg class Poisson count regression model with a sci-kit learn style interface along with important inferential statistics. This model class has appropriate `fit`, `predict`, and `score` methods to provide Poisson count regression analysis with the model specified.
 
 ## R Ecosystem Role
 
-This package will build off the EDA and statistical analysis provided by `ggplot2` included in the [Tidiverse](https://ggplot2.tidyverse.org/#:~:text=Learning%20ggplot2&text=The%20Data%20Visualisation%20and%20Graphics,ggplot2%20as%20quickly%20as%20possible.) package as well as [base R](https://stat.ethz.ch/R-manual/R-devel/library/base/html/00Index.html) package to streamline data visualization and model analysis functionality. There are some existing packages that help you with this, however the `aridanalysis` package aims to ease the job to provide different regression analysis interpretations. 
+This package will build off the EDA and statistical analysis provided by `ggplot2` included in the [Tidyverse](https://ggplot2.tidyverse.org/#:~:text=Learning%20ggplot2&text=The%20Data%20Visualisation%20and%20Graphics,ggplot2%20as%20quickly%20as%20possible.) package as well as [base R](https://stat.ethz.ch/R-manual/R-devel/library/base/html/00Index.html) package to streamline data visualization and model analysis functionality. There are some existing packages that help you with this, however the `aridanalysis` package aims to ease the job to provide different regression analysis interpretations. 
 
 ### Related Packages
 
@@ -36,7 +36,12 @@ This package will build off the EDA and statistical analysis provided by `ggplot
 
 ## Installation
 
-- TODO
+The aRidanalysis package is not currently available on CRAN, but can be installed from GitHub using the following commands:
+
+```
+install.packages("devtools")
+devtools::install_github("UBC-MDS/noaastnr")
+```
 
 ## Features
 
@@ -52,7 +57,9 @@ This package will build off the EDA and statistical analysis provided by `ggplot
 
 ## Documentation
 
-The official documentation is hosted on Read the Docs: 
+Documentation files located on GitHub [here](https://github.com/UBC-MDS/aRidanalysis/tree/main/man).
+
+These instructions are available during development after package installation through help(<function>) and ?<function> commands.
 
 ## Contributors
 
