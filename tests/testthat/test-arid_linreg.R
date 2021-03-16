@@ -23,6 +23,7 @@ testthat::test_that('Incorrect linear regression model constructor inputs', {
 testthat::test_that('Incorrect linear regression model fit inputs', {
   expect_error(arid_linreg()$fit(NULL, y))
   expect_error(arid_linreg()$fit(X, NULL))
+  expect_error(arid_linreg()$fit(X, as.matrix(c(1),c(0))))
   expect_warning(arid_linreg()$fit(dplyr::select(linear_df, x1:x3), y))
   expect_warning(arid_linreg()$fit(X, dplyr::select(linear_df, y)))
   expect_error(arid_linreg()$fit(X, c('a','b','c')))
