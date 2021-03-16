@@ -40,7 +40,7 @@ The aRidanalysis package is not currently available on CRAN, but can be installe
 
 ```
 install.packages("devtools")
-devtools::install_github("UBC-MDS/noaastnr")
+devtools::install_github("UBC-MDS/aridanalysis")
 ```
 
 ## Features
