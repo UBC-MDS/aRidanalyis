@@ -165,7 +165,6 @@ arid_linreg <- function(regularization=NULL, lambda=NULL) {
       stop('ERROR: Response y is not numeric')
     }
     if (nrow(X) != nrow(y)) {
-      print('WHAT IS going on here?')
       stop('ERROR: Input samples X and responses y not the same length')
     }
 
