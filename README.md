@@ -1,3 +1,5 @@
+[![R-CMD-check](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/build.yml/badge.svg)](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/build.yml)
+
 # aRidanalysis 
 
 DRY out your regression analysis!
