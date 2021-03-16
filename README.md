@@ -1,4 +1,5 @@
-[![R-CMD-check](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/build.yml/badge.svg)](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/build.yml)
+[![R-CMD-check](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/R-CMD-check.yaml)
+[![codecov](https://codecov.io/gh/UBC-MDS/aRidanalysis/branch/main/graph/badge.svg?token=JC89HJB540)](https://codecov.io/gh/UBC-MDS/aRidanalysis)
 [![test-coverage](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/test-coverage.yaml)
 
 # aRidanalysis 
