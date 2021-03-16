@@ -1,4 +1,5 @@
 [![R-CMD-check](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/build.yml/badge.svg)](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/build.yml)
+[![test-coverage](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/UBC-MDS/aRidanalysis/actions/workflows/test-coverage.yaml)
 
 # aRidanalysis 
 
