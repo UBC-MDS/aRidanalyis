@@ -13,6 +13,7 @@ testthat::test_that('Incorrect model type specification should generate error', 
   expect_error(arid_countreg(X,y, model="aditive"))
   expect_error(arid_countreg(X,y, model="interact", verbose=1))
   expect_error(arid_countreg(X,y, model= 0 , verbose=0))
+  expect_error(arid_countreg(X,y, model=c("additive", "interactive")))
 
 })
 
@@ -122,7 +123,7 @@ testthat::test_that('Output should be of the correct length', {
   expect_equal(length(arid_countreg(X,y, model="interactive")$coef_), 3)
   expect_identical(arid_countreg(X,y, model = "additive",
                                  fit_intercept = FALSE)$intercept_,
-                   NULL)
+                                 NULL)
 
 })
 testthat::test_that('Incorrect model types and classes should give error', {
@@ -203,3 +204,43 @@ testthat::test_that('Test correct results of predict function', {
 
 
 })
+
+testthat::test_that('Test correct results of score function', {
+  X <- tibble::tribble(
+    ~badh,     ~age,
+    "good",      58,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+    "bad",       57,
+    "good",      33,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+    "good",      33,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+    "bad",       57,
+    "good",      33,
+    "good",      44,
+    "bad",       54,
+    "bad",       57,
+    "good",      33,
+  )
+  y <- c(30L,16L,20L,20L,15L, 30L,16L,20L,
+         50L,15L, 30L,16L,14L,60L,15L,
+         20L,25L, 19L,56L,20L,30L,15L,
+         30L,16L,20L,19L)
+  b <- arid_countreg(X,y, model = "additive", verbose=TRUE)
+  expect_equal(nrow(b$score(b$count_model_)),2)
+}
+)
+
