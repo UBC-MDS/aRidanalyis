@@ -499,10 +499,10 @@ arid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, m
     }
 
     if (verbose == TRUE) {
-      for (i in seq(initial_value, nrow(tidy(count_model)))) {
+      for (i in seq(initial_value, nrow(broom::tidy(count_model)))) {
         if (broom::tidy(count_model)$p.value[i] < alpha){
           print(" ")
-          print(paste("The variable", tidy(count_model)$term[i], "has a statistically significant association over the response"))
+          print(paste("The variable", broom::tidy(count_model)$term[i], "has a statistically significant association over the response"))
         }
 
       }

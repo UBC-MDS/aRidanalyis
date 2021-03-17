@@ -180,7 +180,8 @@ testthat::test_that('Incorrect integration of model type throws error ', {
     "good",      33,
   )
   y <- c(30L,16L,20L,20L,15L)
-  expect_identical(arid_countreg(X,y, model="additive", alpha=0.1)$type_,
+  expect_identical(arid_countreg(X,y, model="additive", alpha=0.1,
+                                 verbose=TRUE)$type_,
                    "additive")
 
 
