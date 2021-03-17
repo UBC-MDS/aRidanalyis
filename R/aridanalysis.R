@@ -388,8 +388,10 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
 
 #' Function to create class object similar to sci-kit learn's object
 #' structure for inferential purposes. Given a data frame, the response,
-#' and certain specifications return a class object with a fit, predict, and
-#' score functions as well as attributes obtained from the statistical analysis
+#' and certain specifications return a generalized regression model interface
+#' for count data (either using a poisson or a negative binomial distribution)
+#' with a fit, predict, and score functions as well as attributes obtained from
+#' the statistical analysis.
 #'
 #'@param X (data_frame): the input data frame with the explanatory variables to fit the model.
 #'@param y (integer): an integer vector with the response to be fitted (only natural numbers).
