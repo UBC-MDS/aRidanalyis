@@ -388,8 +388,10 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
 
 #' Function to create class object similar to sci-kit learn's object
 #' structure for inferential purposes. Given a data frame, the response,
-#' and certain specifications return a class object with a fit, predict, and
-#' score functions as well as attributes obtained from the statistical analysis
+#' and certain specifications return a generalized regression model interface
+#' for count data (either using a poisson or a negative binomial distribution)
+#' with a fit, predict, and score functions as well as attributes obtained from
+#' the statistical analysis.
 #'
 #'@param X (data_frame): the input data frame with the explanatory variables to fit the model.
 #'@param y (integer): an integer vector with the response to be fitted (only natural numbers).
@@ -485,7 +487,8 @@ arid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, m
         count_model <- MASS::glm.nb(formula, data=model_df)
         if (verbose == TRUE) {
           print(
-            "The Poisson model has overdispersion and it is underestimating the variance of the model, hence the negative binomial model will be used"
+            "The Poisson model has overdispersion and it is underestimating the
+            variance of the model, hence the negative binomial model will be used"
           )
           print(" ")
         }
@@ -499,10 +502,11 @@ arid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, m
     }
 
     if (verbose == TRUE) {
-      for (i in seq(initial_value, nrow(tidy(count_model)))) {
+      for (i in seq(initial_value, nrow(broom::tidy(count_model)))) {
         if (broom::tidy(count_model)$p.value[i] < alpha){
           print(" ")
-          print(paste("The variable", tidy(count_model)$term[i], "has a statistically significant association over the response"))
+          print(paste("The variable", broom::tidy(count_model)$term[i], "has a statistically
+                      significant association over the response"))
         }
 
       }
@@ -521,7 +525,7 @@ arid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, m
   }
 
   score <- function(model) {
-    return(tibble(In_Sample_Metric = c("AIC", "Deviance"),
+    return(tibble::tibble(In_Sample_Metric = c("AIC", "Deviance"),
                   Value = c(model$aic, model$deviance)))
   }
   arid_countreg <- list(

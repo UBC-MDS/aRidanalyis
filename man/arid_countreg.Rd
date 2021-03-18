@@ -4,8 +4,10 @@
 \alias{arid_countreg}
 \title{Function to create class object similar to sci-kit learn's object
 structure for inferential purposes. Given a data frame, the response,
-and certain specifications return a class object with a fit, predict, and
-score functions as well as attributes obtained from the statistical analysis}
+and certain specifications return a generalized regression model interface
+for count data (either using a poisson or a negative binomial distribution)
+with a fit, predict, and score functions as well as attributes obtained from
+the statistical analysis.}
 \usage{
 arid_countreg(
   X,
@@ -38,8 +40,10 @@ a class object with three methods and statistical attributes
 \description{
 Function to create class object similar to sci-kit learn's object
 structure for inferential purposes. Given a data frame, the response,
-and certain specifications return a class object with a fit, predict, and
-score functions as well as attributes obtained from the statistical analysis
+and certain specifications return a generalized regression model interface
+for count data (either using a poisson or a negative binomial distribution)
+with a fit, predict, and score functions as well as attributes obtained from
+the statistical analysis.
 }
 \examples{
 X <- as.data.frame(matrix(rnorm(40 * 3), 40, 3))
