@@ -44,9 +44,22 @@ devtools::install_github("UBC-MDS/aridanalysis")
 ```
 
 ## Dependencies
-
-- TODO
-
+``` 
+dplyr,
+tidyr,
+glmnet,
+palmerpenguins,
+ggplot2,
+GGally,
+tidyverse,
+MASS,
+broom,
+AER,
+tibble,
+rlang,
+stringr,
+magrittr
+```
 ## Usage
 
 For usage examples please refer to the [aRidanalysis vignette page]().
