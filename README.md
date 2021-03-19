@@ -39,13 +39,9 @@ This package will build off the EDA and statistical analysis provided by `ggplot
 The aRidanalysis package is not currently available on CRAN, but can be installed from GitHub using the following commands:
 
 ```
-install.packages("devtools")
+# install.packages("devtools")
 devtools::install_github("UBC-MDS/aridanalysis")
 ```
-
-## Features
-
-- TODO
 
 ## Dependencies
 
@@ -53,7 +49,7 @@ devtools::install_github("UBC-MDS/aridanalysis")
 
 ## Usage
 
-- TODO
+For usage examples please refer to the [aRidanalysis vignette page]().
 
 ## Documentation
 
@@ -68,7 +64,3 @@ Craig McLaughlin              : @cmmclaug
 Daniel Ortiz Nunez            : @danielon-5  
 Neel Phaterpekar              : @nphaterp  
 Santiago Rugeles Schoonewolff : @ansarusc  
-
-### Credits
-
-- TODO
