@@ -38,7 +38,14 @@ Imports:
     tibble,
     rlang,
     stringr,
-    magrittr
+    magrittr,
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    palmerpenguins,
+    tidyr,
+    dplyr,
+    magrittr
 Config/testthat/edition: 3
+VignetteBuilder: knitr

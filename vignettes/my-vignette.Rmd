@@ -1,0 +1,133 @@
+---
+title: "Introduction to aRidanalysis"
+author: Craig McLaughlin, Daniel Ortiz, Neel Phaterpekar, Santiago Rugeles
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{my-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include=FALSE}
+library(aRidanalysis)
+```
+
+## Connecting Machine Learning Python Users and the R Programming Language
+
+A model´s purpose and potential usage is the crucial decision that determines the characteristics the model will have. For instance, a machine learning model focused on prediction is optimized to maximize a score metric and be deployed on unseen data, hence it is more complex. Meanwhile, a statistical analysis model centered on answering inferential questions is characterized by its simple manipulation and interpretability. A clear example of this phenomenon is that Scikit-Learn weights the feature coefficients based on their association with one another instead of informing if a feature interaction is significant or influential over the response. That being said, Python´s Scikit-Learn module is currently the most known and used package for machine learning and feature selection. Thus, a considerable amount of users are accustomed to its coding syntax and model formulation.
+
+For these same users to apply statistical analysis and regression models in R, they require to learn a completely different programming language to create both significant plots and EDA analysis using GGPlot2 and regression models, primarily focused on inference and causal outcomes. Taking this into consideration, this package´s objective is to bridge the gap R programming language and python users. We attempted to do this by providing a function to perform both exploratory data analysis and three environment-class instances very similar to the python interface to use regression models for inference purposes.
+
+## Install Guide
+
+The aRidanalysis package is not currently available on CRAN, hence, the `install.packages()` function will not work. Nonetheless, for installation and usage, use the devtools package.
+
+```{r}
+#install.packages("devtools")
+#devtools::install_github("UBC-MDS/aridanalysis")
+```
+
+# arid\_eda()
+
+A function that uses ggplot2 to provide two informative plots summarizing the general trends of the data presented. It requires the specification of a data frame, the response and its type (either numerical or categorical) and a list of the supported explanatory variables. For its application, the user does not require any prior knowledge on ggplot2, making it very welcoming for new R users and useful for anyone that requires a quick and concise visualization of the data before a proper statistical analysis.
+
+Here is an instance of the function's output using the penguin's dataset. For a categorical response, the function returns a KDE of the response's different levels and a correlation matrix of the data features, useful for obtaining a general idea of which variables have an influential association with the response and identifying any possible multicollinearity tendencies. On the other hand, when the response is numeric and continuous, the density plot is replaced by a histogram of its general behavior.
+
+```{r , fig.width = 7,  fig.height = 5}
+head(palmerpenguins::penguins)
+arid_eda(palmerpenguins::penguins, 'species', 'categorical', c('body_mass_g'))
+```
+
+```{r, , fig.width = 7,  fig.height = 5}
+
+arid_eda(palmerpenguins::penguins, 'body_mass_g', 'numeric', c('flipper_length_mm'))
+```
+
+# arid\_linreg()
+
+A function that creates a class object model using an linear regression mimicking Scikit Learn's interface and functionality. The function's output is an object of type `arid_linreg` with three methods (fit, predict and score) and two attributes for statistical analysis and interpretation, the coefficients and the intercept. All the object-oriented functionalities can be retrieved using the \$ sign.
+
+As for inputs, only the data frame of the explanatory variables and the response are required in their known X and y representation. Nonetheless, if a similar model oriented towards prediction was previously trained and tuned using the same data, a known regularization method (either Ridge, Lasso or Elasticnet) along with its strength penalization parameter can be applied. The function is tested on the mtcars dataset, using `hp` as the continuous response variable.
+
+```{r, warning=FALSE}
+data(mtcars)
+head(mtcars, 6)
+model <- arid_linreg()
+model <- model$fit(as.matrix(subset(mtcars, select=mpg:disp)), as.matrix(mtcars['hp']))
+
+
+model$intercept_
+model$coef_
+
+model$predict(matrix(c(20, 5, 180), nrow=1, ncol=3))
+model$score()
+```
+
+# arid\_logreg()
+
+Similar to the linear regression case explained above, this function creates a class object model of logistic regression which mimics Scikit Learn's interface and functionality. Both binomial and multinomial models are supported. The function's output is an object of type arid\_logreg with three methods (fit, predict and score) and two attributes for statistical analysis and interpretation, the coefficients and the intercept. All the object-oriented functionalities can be retrieved using the \$ sign.
+
+As for inputs, only the data frame of the explanatory variables and the response are required in their known X and y representation. Nonetheless, if a similar model oriented towards prediction was previously trained and tuned using the same data, a known regularization method (either Ridge, Lasso or Elasticnet) along with its strength penalization parameter can be applied. Below, the function is tested on the penguin's dataset, using `sex` as the binary response variable for logistic regression.
+
+```{r}
+
+x <- palmerpenguins::penguins %>%
+    tidyr::drop_na() %>%
+    dplyr::select(body_mass_g, flipper_length_mm, bill_depth_mm) %>%
+    dplyr::slice(1:50) %>%
+    as.matrix()
+y <- palmerpenguins::penguins %>% 
+    tidyr::drop_na() %>%
+    dplyr::select(sex) %>%
+    dplyr::slice(1:50)
+levels(y$sex) <- c(1,0)  
+y$sex <- as.numeric(as.character(y$sex))
+y <- unlist(y)
+
+model <- arid_logreg(x, y)
+print(model$coef_)
+print(model$intercept_)
+
+
+```
+
+```{r}
+x_new <- palmerpenguins::penguins %>% 
+    tidyr::drop_na() %>%
+    dplyr::select(body_mass_g, flipper_length_mm, bill_depth_mm) %>%
+    dplyr::slice(71:80) %>%
+    as.matrix()
+
+model$predict(x_new)
+```
+
+# arid\_countreg()
+
+Like its two previous counterparts, the arid\_countreg() function creates a class object model of linear regression for counting data (response is restricted to be a positive integer) and mimics Scikit Learn's interface and functionality. As a default, the function applied Poisson Regression. However, if overdispersion tendencies are detected via the AER package, the negative binomial distribution will be used instead. The function's output is an object of type arid\_countreg with three methods (fit, predict\_count and score) and four attributes for statistical analysis and interpretation, the model itself, the coefficients, the intercept and the pvalues of each explanatory variable. All the object-oriented functionalities can be retrieved using the \$ sign.
+
+The explanatory variables' data frame and the response are required in their known X and y representation as inputs. Other crucial inputs are whether the model should consider or not the interaction terms, the significance level, whether the model should consider the intercept and a verbose statement that informs the significant variables in the model. The function is tested on the warpbreaks dataset, using breaks as a response.
+
+```{r}
+data(warpbreaks)
+X <- warpbreaks %>%
+  dplyr::select(wool, tension)
+y <- warpbreaks$breaks
+y <- as.integer(y)
+ head(warpbreaks)
+fit_model <- arid_countreg(X, y, alpha=0.05, model="additive")
+ 
+ fit_model$coef_
+ fit_model$intercept_
+ fit_model$p_values_
+ 
+ 
+ 
+fit_model$score(fit_model$count_model_)
+```
