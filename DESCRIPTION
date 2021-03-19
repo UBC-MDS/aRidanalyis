@@ -1,16 +1,19 @@
 Package: aRidanalysis
 Title: DRY out your regression analysis!
-Version: 0.0.0.9000
+Version: 0.3.0
 Authors@R: 
     person(given = "Santiago",
            family = "Rugeles Schoonewolff",
-           role = c("aut", "cre"))
+           role = c("aut", "cre"),
+           email = "nphaterp@ualberta.ca")
     person(given = "Daniel",
            family = "Ortiz Nunez",
-           role = c("aut", "cre"))
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"))
+           role = c("aut", "cre"),
+           email = "daniel.ortiz.n@gmail.com")
+    person(given = "Neel",
+           family = "Phaterpekar",
+           role = c("aut", "cre"),
+           email = "nphaterp@ualberta.ca")
     person(given = "Craig",
            family = "McLaughlin",
            role = c("aut", "cre"),
