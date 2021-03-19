@@ -6,7 +6,7 @@
 linear regression interface functionality and attributes. The arid_linreg
 function instantiates a linear regression model type based on the input
 specifications and provides methods to fit/predict/score the results and
-retrieve sklearn attributes.}
+retrieve the calculated sklearn coefficients.}
 \usage{
 arid_linreg(regularization = NULL, lambda = NULL)
 }
@@ -24,7 +24,7 @@ Function that builds an arid_linreg class model object that provides sklearn
 linear regression interface functionality and attributes. The arid_linreg
 function instantiates a linear regression model type based on the input
 specifications and provides methods to fit/predict/score the results and
-retrieve sklearn attributes.
+retrieve the calculated sklearn coefficients.
 }
 \examples{
 model <- arid_linreg()

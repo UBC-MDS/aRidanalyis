@@ -75,7 +75,7 @@ arid_eda <- function(df, response, response_type = 'numeric', features = c()){
 #' linear regression interface functionality and attributes. The arid_linreg
 #' function instantiates a linear regression model type based on the input
 #' specifications and provides methods to fit/predict/score the results and
-#' retrieve sklearn attributes.
+#' retrieve the calculated sklearn coefficients.
 #'
 #'
 #'@param regularization (character): A string defining NULL,'L1','L2', or 'L1L2'
@@ -98,7 +98,10 @@ arid_linreg <- function(regularization=NULL, lambda=NULL) {
     if (!is.null(regularization) & !is.character(regularization)) {
       stop('ERROR: regularization input must be a character vector')
     }
-    if (!is.null(regularization) & !(regularization %in% c(NULL, "L1", "L2", "L1L2"))) {
+    if (!is.null(regularization) & !(regularization %in% c(NULL,
+                                                           "L1",
+                                                           "L2",
+                                                           "L1L2"))) {
       stop('ERROR: Invalid regularization input value')
     }
   }
@@ -116,6 +119,7 @@ arid_linreg <- function(regularization=NULL, lambda=NULL) {
   thisEnv <- environment()
   assign("regularization_", regularization, thisEnv)
   assign("lambda_", lambda, thisEnv)
+  assign("model_", NULL, thisEnv)
   assign("intercept_", NULL, thisEnv)
   assign("coef_", NULL, thisEnv)
 
@@ -134,12 +138,6 @@ arid_linreg <- function(regularization=NULL, lambda=NULL) {
     # Store the lowest error lambda in instance
     assign("lambda_", lambda, thisEnv)
     return(coefs)
-  }
-
-  # function to assign intercept and coefficients
-  set_coefs <- function(coefs, lambda) {
-    assign("intercept_", coefs[1], thisEnv)
-    assign("coef_", coefs[c(-1)], thisEnv)
   }
 
   # arid_linreg::fit method to fit input sample regression model
@@ -167,7 +165,6 @@ arid_linreg <- function(regularization=NULL, lambda=NULL) {
       stop('ERROR: Response y is not numeric')
     }
     if (nrow(X) != nrow(y)) {
-      print(length(X))
       stop('ERROR: Input samples X and responses y not the same length')
     }
 
@@ -175,16 +172,32 @@ arid_linreg <- function(regularization=NULL, lambda=NULL) {
     model <- NULL
     if(is.null(regularization_)) {
       lambda_ <- 0
-      model <- glmnet::glmnet(X, y, family = 'gaussian', alpha = 1, lambda = lambda_)
+      model <- glmnet::glmnet(X,
+                              y,
+                              family = 'gaussian',
+                              alpha = 1,
+                              lambda = lambda_)
     }
     else if(regularization == c("L1")) {
-      model <- glmnet::glmnet(X, y, alpha = 1, family = 'gaussian', lambda = lambda_)
+      model <- glmnet::glmnet(X,
+                              y,
+                              alpha = 1,
+                              family = 'gaussian',
+                              lambda = lambda_)
     }
     else if(regularization == c("L2")) {
-      model <- glmnet::glmnet(X, y, alpha = 0, family = 'gaussian', lambda = lambda_)
+      model <- glmnet::glmnet(X,
+                              y,
+                              alpha = 0,
+                              family = 'gaussian',
+                              lambda = lambda_)
     }
     else if(regularization == c("L1L2")) {
-      model <- glmnet::glmnet(X, y, alpha = 0.5, family = 'gaussian', lambda = lambda_)
+      model <- glmnet::glmnet(X,
+                              y,
+                              alpha = 0.5,
+                              family = 'gaussian',
+                              lambda = lambda_)
     }
 
     # Get the coefficients from the fit model
@@ -375,8 +388,10 @@ arid_logreg <- function(X, y, regularization=NULL, lambda=NULL){
 
 #' Function to create class object similar to sci-kit learn's object
 #' structure for inferential purposes. Given a data frame, the response,
-#' and certain specifications return a class object with a fit, predict and
-#' core functions as well as attributes obtained from the statistical analysis
+#' and certain specifications return a generalized regression model interface
+#' for count data (either using a poisson or a negative binomial distribution)
+#' with a fit, predict, and score functions as well as attributes obtained from
+#' the statistical analysis.
 #'
 #'@param X (data_frame): the input data frame with the explanatory variables to fit the model.
 #'@param y (integer): an integer vector with the response to be fitted (only natural numbers).
@@ -472,7 +487,8 @@ arid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, m
         count_model <- MASS::glm.nb(formula, data=model_df)
         if (verbose == TRUE) {
           print(
-            "The Poisson model has overdispersion and it is underestimating the variance of the model, hence the negative binomial model will be used"
+            "The Poisson model has overdispersion and it is underestimating the
+            variance of the model, hence the negative binomial model will be used"
           )
           print(" ")
         }
@@ -486,10 +502,11 @@ arid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, m
     }
 
     if (verbose == TRUE) {
-      for (i in seq(initial_value, nrow(tidy(count_model)))) {
+      for (i in seq(initial_value, nrow(broom::tidy(count_model)))) {
         if (broom::tidy(count_model)$p.value[i] < alpha){
           print(" ")
-          print(paste("The variable", tidy(count_model)$term[i], "has a statistically significant association over the response"))
+          print(paste("The variable", broom::tidy(count_model)$term[i], "has a statistically
+                      significant association over the response"))
         }
 
       }
@@ -508,7 +525,7 @@ arid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, m
   }
 
   score <- function(model) {
-    return(tibble(In_Sample_Metric = c("AIC", "Deviance"),
+    return(tibble::tibble(In_Sample_Metric = c("AIC", "Deviance"),
                   Value = c(model$aic, model$deviance)))
   }
   arid_countreg <- list(
