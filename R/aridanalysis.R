@@ -487,8 +487,7 @@ arid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, m
         count_model <- MASS::glm.nb(formula, data=model_df)
         if (verbose == TRUE) {
           print(
-            "The Poisson model has overdispersion and it is underestimating the
-            variance of the model, hence the negative binomial model will be used"
+            "The Poisson model has overdispersion and it is underestimating the variance of the model, hence the negative binomial model will be used"
           )
           print(" ")
         }
@@ -505,8 +504,7 @@ arid_countreg <- function(X, y, alpha=0.05, fit_intercept=TRUE, verbose=FALSE, m
       for (i in seq(initial_value, nrow(broom::tidy(count_model)))) {
         if (broom::tidy(count_model)$p.value[i] < alpha){
           print(" ")
-          print(paste("The variable", broom::tidy(count_model)$term[i], "has a statistically
-                      significant association over the response"))
+          print(paste("The variable", broom::tidy(count_model)$term[i], "has a statistically significant association over the response"))
         }
 
       }
