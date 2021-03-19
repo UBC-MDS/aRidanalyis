@@ -66,11 +66,11 @@ magrittr
 ```
 ## Usage
 
-For usage examples please refer to the [aRidanalysis vignette page]().
+For usage examples please refer to the [aRidanalysis vignette page](https://ubc-mds.github.io/aRidanalysis/articles/my-vignette.html).
 
 ## Documentation
 
-Documentation files located on GitHub [here](https://github.com/UBC-MDS/aRidanalysis/tree/main/man).
+Documentation files located on GitHub [here](https://ubc-mds.github.io/aRidanalysis/).
 
 These instructions are available during development after package installation through help(<function>) and ?<function> commands.
 
