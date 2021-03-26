@@ -4,7 +4,7 @@
 #'
 #'@param df (data frame): the input data frame to analyze
 #'@param response (character): the column name of the response variable
-#'@param response_type (character): string indicating if response is 'categorical' or 'continuous' (default: 'numeric')
+#'@param response_type (character): string indicating if response is 'categorical' or 'numeric' (default: 'numeric')
 #'@param features (list<string>): a list of explanatory variable column names (default: c())
 #'
 #'@returns data frame: a data frame with a list of features and their coefficients
@@ -13,7 +13,7 @@
 #'@export
 #'
 #'@examples
-#'arid_eda(house_prices, 'price', 'continuous, c('rooms', 'age','garage'))
+#'arid_eda(palmerpenguins::penguins, 'body_mass_g', 'numeric', c('flipper_length_mm'))
 arid_eda <- function(df, response, response_type = 'numeric', features = c()){
 
   if (all(features %in% colnames(df)) == FALSE){
